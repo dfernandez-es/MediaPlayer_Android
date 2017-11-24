@@ -16,10 +16,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,14 +32,22 @@ public class MainActivity extends AppCompatActivity {
     Handler h = new Handler();
     SeekBar barra;
 
+    ImageView foto;
+    TextView posicion,duracion,titulo;
+    double tiempoFin,tiempoActual;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        barra=(SeekBar)findViewById(R.id.barra);
 
+
+        barra=(SeekBar)findViewById(R.id.barra);
+        titulo=(TextView)findViewById(R.id.titulo);
+        posicion=(TextView)findViewById(R.id.posicion);
+        duracion=(TextView)findViewById(R.id.duracion);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +104,23 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Error al leer el archivo", Toast.LENGTH_SHORT).show();
             return;
         }
+
         barra.setMax(mp.getDuration());
+        barra.setProgress((int)tiempoActual);
+        titulo.setText(cancion);
+        tiempoFin=mp.getDuration();
+        tiempoActual=mp.getCurrentPosition();
+        duracion.setText(String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes((long) tiempoFin),
+                TimeUnit.MILLISECONDS.toSeconds((long) tiempoFin) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                        tiempoFin)))
+        );
+        posicion.setText(String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes((long) tiempoActual),
+                TimeUnit.MILLISECONDS.toSeconds((long) tiempoActual) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                        tiempoActual)))
+        );
+
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -137,6 +164,12 @@ public class MainActivity extends AppCompatActivity {
             //Solo se ejecuta si la musica esta en ejecucion
             if(mp.isPlaying()) {
                 barra.setProgress((mp.getCurrentPosition()));
+                tiempoActual = mp.getCurrentPosition();
+                posicion.setText(String.format("%02d:%02d",
+                        TimeUnit.MILLISECONDS.toMinutes((long) tiempoActual),
+                        TimeUnit.MILLISECONDS.toSeconds((long) tiempoActual) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                tiempoActual)))
+                );
                 //Se llama a si misma cada 100 milisegundos
                 h.postDelayed(this, 100);
             }
