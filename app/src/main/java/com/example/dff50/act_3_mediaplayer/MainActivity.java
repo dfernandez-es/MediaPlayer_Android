@@ -1,6 +1,7 @@
 package com.example.dff50.act_3_mediaplayer;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -53,14 +54,19 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Reproductos multimedia", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
 
-        //Se solicita permisos de lectura en la memoria externa
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        //Se solicita permisos de escritura en la memoria externa, nos permitira leer el archivo
+        //y poder crear la carpeta que se solicita en la practica
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         rutaArchivo = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+
+        //Comprueba si la carpeta que se solicita en la practica existe, en caso negativo la crea
+        File carpeta = new File(rutaArchivo+"/MiMusica");
+        if(!carpeta.exists()) carpeta.mkdirs();
 
         //Funciones que se ejecutan al pulsar sobre la barra
         barra.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -93,9 +99,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void CargarMediaPlayer() {
         mp = new MediaPlayer();
-        String fichero = rutaArchivo + "/" + cancion;
+        String fichero = rutaArchivo + "/MiMusica/" + cancion;
         try {
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mp.setDataSource(fichero);
@@ -159,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Se encarga de actualizar la barra de progreso segun se ejecuta la cancion
     public Runnable RefrescarBarra = new Runnable() {
+        @SuppressLint("DefaultLocale")
         @Override
         public void run() {
             //Solo se ejecuta si la musica esta en ejecucion
