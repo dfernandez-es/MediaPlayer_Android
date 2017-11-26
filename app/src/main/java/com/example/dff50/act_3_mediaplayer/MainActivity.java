@@ -2,8 +2,12 @@ package com.example.dff50.act_3_mediaplayer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     MediaPlayer mp;
     File rutaArchivo;
-    String cancion = "master.mp3";
     Handler h = new Handler();
     SeekBar barra;
 
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Reproductos multimedia", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Reproductor multimedia", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -102,21 +105,40 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("DefaultLocale")
     private void CargarMediaPlayer() {
         mp = new MediaPlayer();
-        String fichero = rutaArchivo + "/MiMusica/" + cancion;
+        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+    }
+
+
+    @SuppressLint("DefaultLocale")
+    private void CargarCancion(String fichero) {
         try {
-            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mp.setDataSource(fichero);
             mp.prepare();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Error al leer el archivo", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Error al leer fichero o no seleccionado", Toast.LENGTH_SHORT).show();
             return;
         }
-
         barra.setMax(mp.getDuration());
         barra.setProgress((int)tiempoActual);
-        titulo.setText(cancion);
+        //Cortamos la cadena para quedarnos con el nombre del archivo
+        titulo.setText(fichero.substring(fichero.lastIndexOf("/")+1));
         tiempoFin=mp.getDuration();
         tiempoActual=mp.getCurrentPosition();
+
+        MediaMetadataRetriever imagenMP3 = new MediaMetadataRetriever();
+        imagenMP3.setDataSource(fichero);
+        byte[] artBytes =  imagenMP3.getEmbeddedPicture();
+        if(artBytes!=null)
+        {
+
+            Bitmap bm = BitmapFactory.decodeByteArray(artBytes, 0, artBytes.length);
+           foto.setImageBitmap(bm);
+        }
+        else
+        {
+            foto.setImageResource(R.drawable.ic_menu_camera);
+        }
+
         duracion.setText(String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes((long) tiempoFin),
                 TimeUnit.MILLISECONDS.toSeconds((long) tiempoFin) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
@@ -160,6 +182,13 @@ public class MainActivity extends AppCompatActivity {
             mp.pause();
         }
 
+        if(id == R.id.abrirFichero){
+            if(mp.isPlaying()) {
+                mp.pause();
+            }
+            Intent i = new Intent(getApplicationContext(),ListarCarpeta.class);
+            startActivityForResult(i,1);
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -184,4 +213,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==1){
+            if(resultCode==RESULT_OK) {
+                String cancionSeleccionada = data.getExtras().getString("cancionSelec");
+                if(cancionSeleccionada != null){
+                    mp.reset();
+                    tiempoActual=0;
+                    CargarCancion(cancionSeleccionada);
+                }
+            }
+        }
+    }
 }

@@ -15,5 +15,11 @@
         android:icon="@android:drawable/ic_media_pause"
         android:title="Stop"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/abrirFichero"
+        android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="100"
+        android:title="Stop"
+        app:showAsAction="always" />
 
 </menu>

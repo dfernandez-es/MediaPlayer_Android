@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ACT_3_MediaPlayer.iml" filepath="$PROJECT_DIR$/ACT_3_MediaPlayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ACT_3_MediaPlayer.iml" filepath="$PROJECT_DIR$/.idea/ACT_3_MediaPlayer.iml" />
+      <module fileurl="file://D:\Users\s3v3n\trabajos\ACT_3_MediaPlayer\ACT_3_MediaPlayer.iml" filepath="D:\Users\s3v3n\trabajos\ACT_3_MediaPlayer\ACT_3_MediaPlayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
