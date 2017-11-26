@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     SeekBar barra;
 
     ImageView foto;
+    TextView anyo;
+    TextView grupo;
     TextView posicion,duracion,titulo;
     double tiempoFin,tiempoActual;
 
@@ -52,15 +54,9 @@ public class MainActivity extends AppCompatActivity {
         titulo=(TextView)findViewById(R.id.titulo);
         posicion=(TextView)findViewById(R.id.posicion);
         duracion=(TextView)findViewById(R.id.duracion);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Reproductor multimedia", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        foto=(ImageView)findViewById(R.id.foto);
+        anyo=(TextView)findViewById(R.id.anyo);
+        grupo=(TextView)findViewById(R.id.grupo);
 
         //Se solicita permisos de escritura en la memoria externa, nos permitira leer el archivo
         //y poder crear la carpeta que se solicita en la practica
@@ -125,18 +121,34 @@ public class MainActivity extends AppCompatActivity {
         tiempoFin=mp.getDuration();
         tiempoActual=mp.getCurrentPosition();
 
+        //Comprueba si el archivo de audio contiene una imagen y la muestra
         MediaMetadataRetriever imagenMP3 = new MediaMetadataRetriever();
         imagenMP3.setDataSource(fichero);
         byte[] artBytes =  imagenMP3.getEmbeddedPicture();
         if(artBytes!=null)
         {
-
             Bitmap bm = BitmapFactory.decodeByteArray(artBytes, 0, artBytes.length);
            foto.setImageBitmap(bm);
         }
         else
         {
-            foto.setImageResource(R.drawable.ic_menu_camera);
+           foto.setImageResource(R.drawable.ic_menu_camera);
+        }
+
+        //Se comprueba si el archivo contiene metadatos del grupo y los muestra
+        if(imagenMP3.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) != null){
+            grupo.setText(imagenMP3.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+        }
+        else{
+            grupo.setText("");
+        }
+
+        //Se comprueba si el archivo contiene metadatos de la fecha de publicacion y los muestra
+        if(imagenMP3.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR) != null){
+            anyo.setText(imagenMP3.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR));
+        }
+        else{
+            anyo.setText("");
         }
 
         duracion.setText(String.format("%02d:%02d",
